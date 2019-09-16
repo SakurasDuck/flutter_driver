@@ -149,9 +149,6 @@ class FlutterDriverExtension {
       'set_text_entry_emulation': (Map<String, String> params) =>
           SetTextEntryEmulation.deserialize(params),
       'tap': (Map<String, String> params) => Tap.deserialize(params),
-      'tap_1': (Map<String, String> params) => Tap.deserialize(params),
-      'tap_2': (Map<String, String> params) => Tap.deserialize(params),
-      'tap__1': (Map<String, String> params) => Tap.deserialize(params),
       'waitFor': (Map<String, String> params) => WaitFor.deserialize(params),
       'waitForAbsent': (Map<String, String> params) =>
           WaitForAbsent.deserialize(params),
@@ -167,16 +164,14 @@ class FlutterDriverExtension {
 
     _finders.addAll(<String, FinderConstructor>{
       'ByText': (SerializableFinder finder) => _createByTextFinder(finder),
+      'ByIndex': (SerializableFinder finder) => _createByIndexFinder(finder),
       'ByTooltipMessage': (SerializableFinder finder) =>
           _createByTooltipMessageFinder(finder),
       'BySemanticsLabel': (SerializableFinder finder) =>
           _createBySemanticsLabelFinder(finder),
       'ByValueKey': (SerializableFinder finder) =>
           _createByValueKeyFinder(finder),
-      'ByType': (SerializableFinder finder) {
-        print('------------------------+++++++++++${(finder as ByType).index}');
-        return _createByTypeFinder(finder);
-      },
+      'ByType': (SerializableFinder finder) => _createByTypeFinder(finder),
       'PageBack': (SerializableFinder finder) => _createPageBackFinder(),
       'Ancestor': (SerializableFinder finder) => _createAncestorFinder(finder),
       'Descendant': (SerializableFinder finder) =>
@@ -306,11 +301,12 @@ class FlutterDriverExtension {
     return finder;
   }
 
+  Finder _createByIndexFinder(ByIndex arguments) {
+    return _createFinder(arguments.finder).at(arguments.index);
+  }
+
   Finder _createByTextFinder(ByText arguments) {
-    if (arguments.index == null)
-      return find.text(arguments.text);
-    else
-      return find.text(arguments.text).at(arguments.index);
+    return find.text(arguments.text);
   }
 
   Finder _createByTooltipMessageFinder(ByTooltipMessage arguments) {
@@ -349,17 +345,9 @@ class FlutterDriverExtension {
   }
 
   Finder _createByTypeFinder(ByType arguments) {
-    print(
-        '---------------------------------------------------${arguments.index}');
-    if (arguments.index == null)
-      return find.byElementPredicate((Element element) {
-        return element.widget.runtimeType.toString() == arguments.type;
-      }, description: 'widget with runtimeType "${arguments.type}"');
-    else
-      return (find.byElementPredicate((Element element) {
-        return element.widget.runtimeType.toString() == arguments.type;
-      }, description: 'widget with runtimeType "${arguments.type}"'))
-          .at(arguments.index);
+    return find.byElementPredicate((Element element) {
+      return element.widget.runtimeType.toString() == arguments.type;
+    }, description: 'widget with runtimeType "${arguments.type}"');
   }
 
   Finder _createPageBackFinder() {
@@ -400,7 +388,6 @@ class FlutterDriverExtension {
     final Tap tapCommand = command;
     final Finder computedFinder =
         await _waitForElement(_createFinder(tapCommand.finder).hitTestable());
-    print('===============================${tapCommand.finder.serialize().toString()}');
     await _prober.tap(computedFinder);
     return const TapResult();
   }

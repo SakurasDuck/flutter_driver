@@ -1125,6 +1125,8 @@ class CommonFinders {
   /// Finds [Text] and [EditableText] widgets containing string equal to [text].
   SerializableFinder text(String text) => ByText(text);
 
+  SerializableFinder byIndex(SerializableFinder finder,int index) => ByIndex(finder,index);
+
   /// Finds widgets by [key]. Only [String] and [int] values can be used.
   SerializableFinder byValueKey(dynamic key) => ByValueKey(key);
 
@@ -1135,7 +1137,7 @@ class CommonFinders {
   SerializableFinder bySemanticsLabel(Pattern label) => BySemanticsLabel(label);
 
   /// Finds widgets whose class name matches the given string.
-  SerializableFinder byType(String type,{int index}) => ByType(type,index:index);
+  SerializableFinder byType(String type) => ByType(type);
 
   /// Finds the back button on a Material or Cupertino page's scaffold.
   SerializableFinder pageBack() => const PageBack();
